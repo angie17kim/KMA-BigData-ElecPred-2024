@@ -1,0 +1,67 @@
+seed: 42
+device: cuda:6
+
+paths:
+  repo_path:   /home/minchan/electric/
+  data_path:   /home/minchan/electric/data/
+  output_path: /home/minchan/electric/output/xgboost_base
+  figure_path: /home/minchan/electric/figure/
+  asset_path:  /media/user/h/minchan/elec_data/assets_after/
+
+data:
+  target_opt: elec_lognorm
+  
+  option_tf: False
+  float16: True
+  # Select the excluded (general, time cyclical, time binary) input variables among the following
+  # ['district', 'units_qt', 'lon_mm', 'lat_mm', 'altitude_mm'] 
+  exclude_general_vars: []
+  # ['dow', 'dom', 'doy', 'woy', 'month', 'h24', 'routine']
+  exclude_timecyc_vars: []
+  # ['weekend', 'holiday']
+  exclude_timebin_vars: []
+  
+  # Select the excluded climate input variables among the following
+  # ['temp_st', 'humid_st', 'tchi_st', 'dci_st', 'hi_st', 'wchi_st', 'atemp_st', 'rain_qt', 'wind_mm']
+  exclude_climate_vars: []
+  # clim_lag variables are determined by the following parameters
+  # past climate variables are aggreated for past times from the present time with the following rule:
+  #   [clim_lag_min, ..., clim_lag_min + clim_window - 1], [clim_lag_min + clim_lag_step, ..., clim_lag_min + clim_lag_step + clim_window - 1], ...
+  #   , until any of the time in the window exceeds the clim_lag_max
+  exclude_climlag_vars: []
+  clim_lag_min: 1  # 1-240
+  clim_lag_max: 24 # lag_min-240
+  clim_lag_step: 3
+  clim_lag_window: 3
+  
+# https://xgboost.readthedocs.io/en/stable/parameter.html
+xgboost:
+  optuna_search: True
+  float16: True
+  callback_period: 50
+  K: 3
+
+  default:
+    booster: gbtree
+    n_estimators: 4000
+    early_stopping_rounds: 200
+
+  optimize:
+    booster: False
+    target_opt: False
+    n_estimators: False
+    early_stopping_rounds: False
+
+  suggest:
+    booster:
+      type: categorical
+      choices: ['gbtree', 'dart']
+    target_opt:
+      type: categorical
+      choices: ['elec_lognorm']
+    n_estimators:
+      type: int
+      range: [100, 500]
+    early_stopping_rounds:
+      type: int
+      range: [10, 50]

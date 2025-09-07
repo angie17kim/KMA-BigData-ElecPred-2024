@@ -1,0 +1,87 @@
+seed: 42
+device: cuda:2
+
+paths:
+  data_path:   /home/minchan/electric/data/
+  output_path: /home/minchan/electric/output/with_units
+
+data:
+  exclude_general_vars: ['altitude_mm']
+  exclude_climlag_vars: ['rain_qt']
+
+xgboost:
+  optuna_search: False
+  n_trials: 5
+
+  default:
+    n_estimators: 3000
+    early_stopping_rounds: 50
+    ########################
+    eta: 0.01
+    #
+    max_depth: 13
+    min_child_weight: 1006.4
+    #
+    gamma: 0.101815
+    colsample_bytree: 0.615202
+    #
+    alpha: 0.0019398
+    lambda: 0.0005963
+    #
+    highslope: 0.34481
+    ########################
+
+  optimize:
+    ########################
+    eta: False
+    #
+    max_depth: False
+    min_child_weight: False
+    #
+    gamma: False
+    colsample_bytree: False
+    #
+    alpha: False
+    lambda: False
+    #
+    highslope: False
+    ########################
+
+  suggest:
+    ########################
+    eta:
+      type: float
+      range: [0.0001, 0.1]
+      log: True
+    highslope:  # this is fixed
+      type: float
+      range: [0.3, 0.6]
+      log: False
+    ########################
+    max_depth:
+      type: int
+      range: [10,14]
+      step: 1
+    min_child_weight:
+      type: float
+      range: [256, 1024]
+      log: True
+    ########################
+    gamma:
+      type: float
+      range: [0.0001, 1.0]
+      log: True
+    colsample_bytree:
+      type: float
+      range: [0.6, 1.0]
+      log: False
+    ########################
+    alpha:
+      type: float
+      range: [0.0001, 0.005]
+      log: True
+    lambda:
+      type: float
+      range: [0.0001, 0.005]
+      log: True
+    ########################
